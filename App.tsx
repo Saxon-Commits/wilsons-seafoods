@@ -151,7 +151,7 @@ const HomePage: React.FC<{
                 <ProductList products={filteredProducts} />
               </section>
 
-              <AboutUs text={content.about_text} imageUrl={content.about_image_url} />
+              <AboutUs text={content.about_text} image_url={content.about_image_url} />
 
               <section id="hours" className="text-center">
                 <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-12">Opening Hours</h2>
@@ -436,6 +436,7 @@ const AdminPage: React.FC<{
   onAddProduct: (product: Omit<FishProduct, 'id'>) => Promise<void>;
   onDeleteProduct: (id: number) => void;
   onEditProduct: (product: FishProduct) => void;
+  onToggleVisibility: (id: number) => void;
   onNavigateHome: () => void;
   logoUrl: string;
   onLogoChange: (newLogo: string) => void;
@@ -453,6 +454,7 @@ const AdminPage: React.FC<{
   const [newProductImageFile, setNewProductImageFile] = useState<File | null>(null);
   const [newProductImageUrl, setNewProductImageUrl] = useState<string>('');
   const [isNewProductFresh, setIsNewProductFresh] = useState(false);
+  const [isNewProductVisible, setIsNewProductVisible] = useState(true);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [adminView, setAdminView] = useState<'dashboard' | 'products' | 'settings' | 'homepage'>('dashboard');
 
@@ -499,13 +501,14 @@ const AdminPage: React.FC<{
 
     const { data: urlData } = supabase.storage.from('images').getPublicUrl(filePath);
 
-    await props.onAddProduct({ name: newProductName, price: newProductPrice, image_url: urlData.publicUrl, is_fresh: isNewProductFresh });
+    await props.onAddProduct({ name: newProductName, price: newProductPrice, image_url: urlData.publicUrl, is_fresh: isNewProductFresh, is_visible: isNewProductVisible });
 
     setNewProductName('');
     setNewProductPrice('');
     setNewProductImageFile(null);
     setNewProductImageUrl('');
     setIsNewProductFresh(false);
+    setIsNewProductVisible(true);
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
     }
@@ -594,6 +597,10 @@ const AdminPage: React.FC<{
                     <input type="checkbox" id="is-fresh" checked={isNewProductFresh} onChange={e => setIsNewProductFresh(e.target.checked)} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
                     <label htmlFor="is-fresh" className="text-sm font-medium text-slate-400">Mark as "Fresh Today"</label>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="is-visible" checked={isNewProductVisible} onChange={e => setIsNewProductVisible(e.target.checked)} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
+                    <label htmlFor="is-visible" className="text-sm font-medium text-slate-400">Show on public site</label>
+                  </div>
                   {newProductImageUrl && <img src={newProductImageUrl} alt="Preview" className="mt-2 rounded-md max-h-32 object-contain mx-auto" />}
                   <button type="submit" className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-4 rounded-md transition-colors duration-300">Add Product</button>
                 </form>
@@ -605,7 +612,7 @@ const AdminPage: React.FC<{
                   <ProductList products={props.products} isAdmin={true} onDelete={(name) => {
                     const product = props.products.find(p => p.name === name);
                     if (product && product.id) props.onDeleteProduct(product.id)
-                  }} onEdit={props.onEditProduct} />
+                  }} onEdit={props.onEditProduct} onToggleVisibility={(id) => props.onToggleVisibility(id)} />
                 </div>
               </div>
             </div>
@@ -735,6 +742,22 @@ const App: React.FC = () => {
     setEditingProduct(null);
   };
 
+  const toggleProductVisibility = async (productId: number) => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+
+    const { data, error } = await supabase
+      .from('products')
+      .update({ is_visible: !product.is_visible })
+      .eq('id', productId)
+      .select();
+
+    if (data) {
+      setProducts(prev => prev.map(p => p.id === productId ? data[0] : p));
+    }
+    if (error) console.error("Error toggling visibility:", error);
+  };
+
   const handleLogoChange = async (newLogoUrl: string) => {
     setLogoUrl(newLogoUrl);
     await supabase.from('site_settings').update({ logo_url: newLogoUrl }).eq('id', 1);
@@ -786,13 +809,17 @@ const App: React.FC = () => {
   const filteredProducts = useMemo(() => {
     return products
       .filter(p => {
+        // On public site, only show visible products
+        if (page === 'home' && p.is_visible === false) return false;
+
+        // Filter by "Fresh Today"
         if (activeFilter === 'Fresh Today') {
           return p.is_fresh;
         }
         return true;
       })
       .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [products, activeFilter, searchTerm]);
+  }, [products, activeFilter, searchTerm, page]);
 
   if (loading) {
     return <LoadingSpinner />;
@@ -823,6 +850,7 @@ const App: React.FC = () => {
           onAddProduct={addProduct}
           onDeleteProduct={deleteProduct}
           onEditProduct={handleEditClick}
+          onToggleVisibility={toggleProductVisibility}
           onNavigateHome={navigateToHome}
           logoUrl={logoUrl}
           onLogoChange={handleLogoChange}

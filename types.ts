@@ -4,6 +4,7 @@ export interface FishProduct {
   price: string;
   image_url: string;
   is_fresh?: boolean;
+  is_visible?: boolean;
 }
 
 export interface OpeningHour {

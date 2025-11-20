@@ -13,6 +13,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
   const [price, setPrice] = useState('');
   const [image_url, setImageUrl] = useState('');
   const [is_fresh, setIsFresh] = useState(false);
+  const [is_visible, setIsVisible] = useState(true);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
       setPrice(product.price);
       setImageUrl(product.image_url);
       setIsFresh(product.is_fresh || false);
+      setIsVisible(product.is_visible !== false);
     }
   }, [product]);
 
@@ -44,7 +46,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(product.name, { ...product, name, price, image_url, is_fresh });
+    onSave(product.name, { ...product, name, price, image_url, is_fresh, is_visible });
   };
 
   if (!product) return null;
@@ -80,14 +82,18 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
             <input type="checkbox" id="edit-is-fresh" checked={is_fresh} onChange={e => setIsFresh(e.target.checked)} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
             <label htmlFor="edit-is-fresh" className="text-sm font-medium text-slate-400">Mark as "Fresh Today"</label>
           </div>
+          <div className="flex items-center space-x-2 pt-2">
+            <input type="checkbox" id="edit-is-visible" checked={is_visible} onChange={e => setIsVisible(e.target.checked)} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
+            <label htmlFor="edit-is-visible" className="text-sm font-medium text-slate-400">Show on public site</label>
+          </div>
           {image_url && <img src={image_url} alt="Preview" className="mt-2 rounded-md max-h-40 object-contain mx-auto bg-slate-700" />}
           <div className="pt-4 flex justify-end space-x-4">
             <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-md text-slate-300 bg-slate-700 hover:bg-slate-600 transition-colors font-semibold">Cancel</button>
             <button type="submit" className="bg-brand-blue hover:bg-opacity-80 text-white font-bold py-2.5 px-5 rounded-md transition-colors duration-300">Save Changes</button>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
