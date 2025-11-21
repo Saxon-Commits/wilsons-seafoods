@@ -1073,6 +1073,7 @@ const App: React.FC = () => {
           setSearchTerm={setSearchTerm}
           activeFilter={activeFilter}
           setActiveFilter={setActiveFilter}
+          socialLinks={socialLinks}
         />
       )}
       {page === 'admin' && (
