@@ -575,7 +575,21 @@ const AdminSettings: React.FC<{
             </button>
           </div>
           <input type="file" ref={logoInputRef} onChange={(e) => handleFileChange(e, onLogoChange, setUploadingLogo)} className="hidden" accept="image/*" disabled={uploadingLogo} />
-          <p className="text-center text-slate-400 text-sm">{uploadingLogo ? 'Uploading...' : 'Tap the image to change the logo.'}</p>
+          <p className="text-center text-slate-400 text-sm">{uploadingLogo ? 'Uploading...' : 'Tap the image to upload'}</p>
+          <div className="mt-4">
+            <label htmlFor="logo-url" className="block text-sm font-medium text-slate-300 mb-2">Or paste image URL:</label>
+            <input
+              id="logo-url"
+              type="text"
+              placeholder="https://example.com/logo.png"
+              onBlur={(e) => {
+                if (e.target.value && e.target.value !== logoUrl) {
+                  onLogoChange(e.target.value);
+                }
+              }}
+              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-white text-sm"
+            />
+          </div>
         </div>
 
         {/* Background Uploader */}
@@ -602,7 +616,21 @@ const AdminSettings: React.FC<{
             </button>
           </div>
           <input type="file" ref={bgInputRef} onChange={(e) => handleFileChange(e, onBackgroundChange, setUploadingBg)} className="hidden" accept="image/*" disabled={uploadingBg} />
-          <p className="text-center text-slate-400 text-sm">{uploadingBg ? 'Uploading...' : 'Tap the image to change the background.'}</p>
+          <p className="text-center text-slate-400 text-sm">{uploadingBg ? 'Uploading...' : 'Tap the image to upload'}</p>
+          <div className="mt-4">
+            <label htmlFor="bg-url" className="block text-sm font-medium text-slate-300 mb-2">Or paste image URL:</label>
+            <input
+              id="bg-url"
+              type="text"
+              placeholder="https://example.com/background.jpg"
+              onBlur={(e) => {
+                if (e.target.value && e.target.value !== backgroundUrl) {
+                  onBackgroundChange(e.target.value);
+                }
+              }}
+              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-white text-sm"
+            />
+          </div>
         </div>
       </div>
 
