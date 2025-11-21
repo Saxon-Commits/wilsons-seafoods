@@ -1124,7 +1124,10 @@ const App: React.FC = () => {
     const { error } = await supabase.from('site_settings').update({ logo_url: newLogoUrl }).eq('id', 1);
     if (error) {
       console.error('Error updating logo:', error);
-      alert('Failed to save logo. Please check browser console for details.');
+      alert('❌ Failed to save logo: ' + error.message);
+    } else {
+      console.log('✅ Logo updated successfully to:', newLogoUrl);
+      alert('✅ Logo updated successfully!');
     }
   };
 
@@ -1133,7 +1136,10 @@ const App: React.FC = () => {
     const { error } = await supabase.from('site_settings').update({ background_url: newBgUrl }).eq('id', 1);
     if (error) {
       console.error('Error updating background:', error);
-      alert('Failed to save background. Please check browser console for details.');
+      alert('❌ Failed to save background: ' + error.message);
+    } else {
+      console.log('✅ Background updated successfully to:', newBgUrl);
+      alert('✅ Background updated successfully!');
     }
   };
 
