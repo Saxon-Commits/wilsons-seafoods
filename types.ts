@@ -41,4 +41,14 @@ export interface SiteSettings {
   background_url: string | null;
   social_links?: SocialLinks;
   opening_hours?: OpeningHour[];
+  abn?: string;
+  phone_number?: string;
+}
+
+export interface ContactSubmission {
+  id?: number;
+  created_at?: string;
+  name: string;
+  email: string;
+  message: string;
 }

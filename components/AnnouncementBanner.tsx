@@ -8,9 +8,9 @@ interface AnnouncementBannerProps {
 const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({ text, onDismiss }) => {
   return (
     <div className="bg-brand-blue text-white font-semibold p-3 text-center text-md relative z-30">
-      <p>{text}</p>
-      <button 
-        onClick={onDismiss} 
+      <p className="pr-8">{text}</p>
+      <button
+        onClick={onDismiss}
         className="absolute top-1/2 right-4 -translate-y-1/2 text-white/70 hover:text-white"
         aria-label="Dismiss announcement"
       >

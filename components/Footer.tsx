@@ -6,7 +6,7 @@ const SocialIcon: React.FC<{ href: string, children: React.ReactNode }> = ({ hre
   </a>
 );
 
-const Footer: React.FC<{ socialLinks?: { facebook: string; instagram: string; } }> = ({ socialLinks }) => {
+const Footer: React.FC<{ socialLinks?: { facebook: string; instagram: string; }, abn?: string, phoneNumber?: string }> = ({ socialLinks, abn, phoneNumber }) => {
   return (
     <footer className="bg-[#0f172a] text-slate-300 border-t border-slate-700/50">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -14,12 +14,13 @@ const Footer: React.FC<{ socialLinks?: { facebook: string; instagram: string; } 
           <div>
             <h3 className="text-xl font-serif font-bold text-white">Wilson's Seafoods</h3>
             <p className="mt-2 text-slate-400">Freshness you can taste, from our shores to your table.</p>
+            {abn && <p className="mt-2 text-sm text-slate-500">ABN: {abn}</p>}
           </div>
           <div>
             <h3 className="text-xl font-serif font-bold text-white">Contact Us</h3>
             <div className="mt-2 space-y-1 text-slate-400">
               <p>5 Sussex St, Glenorchy TAS 7010</p>
-              <p>Phone: (03) 6272 6600</p>
+              <p>Phone: {phoneNumber || '(03) 6272 6600'}</p>
             </div>
           </div>
           <div>

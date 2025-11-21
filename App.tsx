@@ -8,7 +8,7 @@ import Hours from './components/Hours';
 import Footer from './components/Footer';
 import EditProductModal from './components/EditProductModal';
 import { OPENING_HOURS, INITIAL_LOGO_URL, INITIAL_HOMEPAGE_CONTENT } from './constants';
-import { FishProduct, OpeningHour, HomepageContent, SiteSettings, SocialLinks } from './types';
+import { FishProduct, OpeningHour, HomepageContent, SiteSettings, SocialLinks, ContactSubmission } from './types';
 import { BoxIcon } from './components/icons/BoxIcon';
 import { SettingsIcon } from './components/icons/SettingsIcon';
 import { CameraIcon } from './components/icons/CameraIcon';
@@ -18,6 +18,8 @@ import { HomeIcon } from './components/icons/HomeIcon';
 import { DashboardIcon } from './components/icons/DashboardIcon';
 import ContactForm from './components/ContactForm';
 import { SearchIcon } from './components/icons/SearchIcon';
+import { MessageIcon } from './components/icons/MessageIcon';
+import AdminMessages from './components/AdminMessages';
 
 // --- Gateway Section Components ---
 const GatewayCard: React.FC<{
@@ -63,9 +65,9 @@ const GatewaySection: React.FC<{
       <div className="grid md:grid-cols-2 gap-8 md:gap-12">
         <GatewayCard
           imageUrl={content.gateway1_image_url || "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200&auto=format&fit=crop"}
-          headline={content.gateway1_title || "Shop Our Public Store"}
-          description={content.gateway1_description || "Get the freshest Tasmanian seafood and pickup in store today. Browse our public store and pay online."}
-          buttonText={content.gateway1_button_text || "Shop Now"}
+          headline={content.gateway1_title || "Public Fish Market"}
+          description={content.gateway1_description || "Visit our store to see the freshest Tasmanian seafood. We are open to the public."}
+          buttonText={content.gateway1_button_text || "View Products"}
           buttonHref={content.gateway1_button_url || "#products"}
           onClick={onSmoothScroll}
         />
@@ -96,7 +98,9 @@ const HomePage: React.FC<{
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
   socialLinks: SocialLinks;
-}> = ({ logoUrl, backgroundUrl, hours, content, isBannerVisible, onDismissBanner, filteredProducts, searchTerm, setSearchTerm, activeFilter, setActiveFilter, socialLinks }) => {
+  abn: string;
+  phoneNumber: string;
+}> = ({ logoUrl, backgroundUrl, hours, content, isBannerVisible, onDismissBanner, filteredProducts, searchTerm, setSearchTerm, activeFilter, setActiveFilter, socialLinks, abn, phoneNumber }) => {
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const href = e.currentTarget.getAttribute('href');
@@ -140,15 +144,20 @@ const HomePage: React.FC<{
             {content.hero_subtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={(e) => handleSmoothScroll(e as any)}
-              className="bg-brand-blue hover:bg-opacity-90 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-brand-blue/30 text-lg"
+            <a
+              href="#products"
+              onClick={handleSmoothScroll}
+              className="bg-brand-blue hover:bg-opacity-90 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-brand-blue/30 text-lg inline-block"
             >
-              <a href="#products">Shop Fresh Seafood</a>
-            </button>
-            <button className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-4 px-10 rounded-full transition-all duration-300 border border-white/30 hover:border-white/50 text-lg">
-              <a href="#about" onClick={(e) => handleSmoothScroll(e as any)}>Our Story</a>
-            </button>
+              View Today's Catch
+            </a>
+            <a
+              href="#about"
+              onClick={handleSmoothScroll}
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-4 px-10 rounded-full transition-all duration-300 border border-white/30 hover:border-white/50 text-lg inline-block"
+            >
+              Our Story
+            </a>
           </div>
         </div>
       </section>
@@ -165,12 +174,18 @@ const HomePage: React.FC<{
             <div className="h-1 w-24 bg-brand-blue mx-auto rounded-full"></div>
           </div>
 
-          <ProductFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            activeFilter={activeFilter}
-            setActiveFilter={setActiveFilter}
-          />
+          <div className="mb-8 flex justify-center">
+            <div className="relative w-full max-w-md">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-full focus:outline-none focus:ring-2 focus:ring-ice-blue text-white placeholder-slate-400 shadow-lg"
+              />
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            </div>
+          </div>
 
           <ProductList products={filteredProducts} />
         </section>
@@ -212,102 +227,89 @@ const HomePage: React.FC<{
 
         {/* Contact Section */}
         <section className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold text-white mb-4">Get In Touch</h2>
-            <p className="text-slate-400">Have a question or special order? Send us a message.</p>
-          </div>
           <ContactForm />
         </section>
       </main>
 
-      <Footer socialLinks={socialLinks} />
+      <Footer socialLinks={socialLinks} abn={abn} phoneNumber={phoneNumber} />
     </div>
   );
 };
 
-// --- Product Filters ---
-const ProductFilters: React.FC<{
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  activeFilter: string;
-  setActiveFilter: (filter: string) => void;
-}> = ({ searchTerm, setSearchTerm, activeFilter, setActiveFilter }) => {
-  const filters = ['All', 'Fresh Fish', 'Shellfish', 'White Fish', 'Sashimi', 'Other'];
 
-  const baseButtonClass = "px-6 py-2.5 rounded-full font-semibold text-md transition-all duration-300";
-  const activeButtonClass = "bg-ice-blue text-slate-900 shadow";
-  const inactiveButtonClass = "bg-slate-800 text-slate-300 hover:bg-slate-700";
-
-  return (
-    <div className="mb-12 flex flex-col md:flex-row items-center justify-center gap-4">
-      <div className="relative w-full md:w-72">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-full focus:outline-none focus:ring-2 focus:ring-ice-blue"
-        />
-        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-      </div>
-      <div className="flex items-center gap-2 p-1 bg-slate-800/50 rounded-full border border-slate-700/50">
-        {filters.map(filter => (
-          <button
-            key={filter}
-            onClick={() => setActiveFilter(filter)}
-            className={`${baseButtonClass} ${activeFilter === filter ? activeButtonClass : inactiveButtonClass}`}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 // --- Admin Sidebar ---
 const AdminSidebar: React.FC<{
   activeView: string;
-  onNavigate: (view: 'dashboard' | 'products' | 'homepage' | 'settings') => void;
-}> = ({ activeView, onNavigate }) => {
+  onNavigate: (view: 'dashboard' | 'products' | 'homepage' | 'settings' | 'messages') => void;
+  isOpen: boolean;
+  onClose: () => void;
+}> = ({ activeView, onNavigate, isOpen, onClose }) => {
   const baseClasses = "flex items-center space-x-3 w-full text-left p-3 rounded-md transition-colors text-lg";
   const activeClasses = "bg-sky-600 text-white";
   const inactiveClasses = "text-slate-300 hover:bg-slate-700";
 
   return (
-    <aside className="w-64 bg-slate-800 p-4 flex flex-col">
-      <div className="text-white text-2xl font-bold mb-10 pl-2 font-serif">
-        Admin Panel
-      </div>
-      <nav>
-        <ul className="space-y-2">
-          <li>
-            <button onClick={() => onNavigate('dashboard')} className={`${baseClasses} ${activeView === 'dashboard' ? activeClasses : inactiveClasses}`}>
-              <DashboardIcon className="w-6 h-6" />
-              <span>Dashboard</span>
-            </button>
-          </li>
-          <li>
-            <button onClick={() => onNavigate('products')} className={`${baseClasses} ${activeView === 'products' ? activeClasses : inactiveClasses}`}>
-              <BoxIcon className="w-6 h-6" />
-              <span>Products</span>
-            </button>
-          </li>
-          <li>
-            <button onClick={() => onNavigate('homepage')} className={`${baseClasses} ${activeView === 'homepage' ? activeClasses : inactiveClasses}`}>
-              <HomeIcon className="w-6 h-6" />
-              <span>Homepage</span>
-            </button>
-          </li>
-          <li>
-            <button onClick={() => onNavigate('settings')} className={`${baseClasses} ${activeView === 'settings' ? activeClasses : inactiveClasses}`}>
-              <SettingsIcon className="w-6 h-6" />
-              <span>Site Settings</span>
-            </button>
-          </li>
-        </ul>
-      </nav>
-    </aside>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-slate-800 p-4 flex flex-col transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none
+        md:relative md:translate-x-0
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="flex justify-between items-center mb-10 pl-2">
+          <div className="text-white text-2xl font-bold font-serif">
+            Admin Panel
+          </div>
+          <button onClick={onClose} className="md:hidden text-slate-400 hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <nav>
+          <ul className="space-y-2">
+            <li>
+              <button onClick={() => onNavigate('dashboard')} className={`${baseClasses} ${activeView === 'dashboard' ? activeClasses : inactiveClasses}`}>
+                <DashboardIcon className="w-6 h-6" />
+                <span>Dashboard</span>
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('products')} className={`${baseClasses} ${activeView === 'products' ? activeClasses : inactiveClasses}`}>
+                <BoxIcon className="w-6 h-6" />
+                <span>Products</span>
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('homepage')} className={`${baseClasses} ${activeView === 'homepage' ? activeClasses : inactiveClasses}`}>
+                <HomeIcon className="w-6 h-6" />
+                <span>Homepage</span>
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('messages')} className={`${baseClasses} ${activeView === 'messages' ? activeClasses : inactiveClasses}`}>
+                <MessageIcon className="w-6 h-6" />
+                <span>Messages</span>
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('settings')} className={`${baseClasses} ${activeView === 'settings' ? activeClasses : inactiveClasses}`}>
+                <SettingsIcon className="w-6 h-6" />
+                <span>Site Settings</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+    </>
   );
 }
 
@@ -354,7 +356,7 @@ const AdminHomepageContent: React.FC<{
   };
 
   return (
-    <div className="bg-slate-800 p-6 rounded-lg shadow-2xl max-w-4xl mx-auto space-y-8">
+    <div className="bg-slate-800 p-4 sm:p-6 rounded-lg shadow-2xl max-w-4xl mx-auto space-y-8">
       <div>
         <h3 className="text-xl font-semibold text-slate-200 mb-3">Hero Section</h3>
         <div className="space-y-4">
@@ -362,13 +364,13 @@ const AdminHomepageContent: React.FC<{
             type="text"
             value={content.hero_title}
             onChange={(e) => onContentChange('hero_title', e.target.value)}
-            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
             placeholder="Hero Title"
           />
           <textarea
             value={content.hero_subtitle}
             onChange={(e) => onContentChange('hero_subtitle', e.target.value)}
-            className="w-full h-24 px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="w-full h-24 px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
             placeholder="Hero Subtitle"
           />
         </div>
@@ -378,7 +380,7 @@ const AdminHomepageContent: React.FC<{
         <textarea
           value={content.announcement_text}
           onChange={(e) => onContentChange('announcement_text', e.target.value)}
-          className="w-full h-24 px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+          className="w-full h-24 px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
           placeholder="Enter announcement text..."
         />
       </div>
@@ -387,7 +389,7 @@ const AdminHomepageContent: React.FC<{
         <textarea
           value={content.about_text}
           onChange={(e) => onContentChange('about_text', e.target.value)}
-          className="w-full h-40 px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+          className="w-full h-40 px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
           placeholder="Enter about us text..."
         />
         <div className="relative group w-full h-48">
@@ -401,7 +403,7 @@ const AdminHomepageContent: React.FC<{
           </button>
         </div>
         <input type="file" ref={bgInputRef} onChange={(e) => handleFileChange(e, 'about_image_url')} className="hidden" accept="image/*" />
-        <p className="text-center text-slate-400 text-sm">Hover over the image to change it.</p>
+        <p className="text-center text-slate-400 text-sm">Tap the image to change it.</p>
       </div>
 
       {/* Gateway Card 1 */}
@@ -412,28 +414,28 @@ const AdminHomepageContent: React.FC<{
             type="text"
             value={content.gateway1_title || ''}
             onChange={(e) => onContentChange('gateway1_title', e.target.value)}
-            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
             placeholder="Card Title"
           />
           <textarea
             value={content.gateway1_description || ''}
             onChange={(e) => onContentChange('gateway1_description', e.target.value)}
-            className="w-full h-24 px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="w-full h-24 px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
             placeholder="Card Description"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
               value={content.gateway1_button_text || ''}
               onChange={(e) => onContentChange('gateway1_button_text', e.target.value)}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
               placeholder="Button Text"
             />
             <input
               type="text"
               value={content.gateway1_button_url || ''}
               onChange={(e) => onContentChange('gateway1_button_url', e.target.value)}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
               placeholder="Button URL"
             />
           </div>
@@ -456,28 +458,28 @@ const AdminHomepageContent: React.FC<{
             type="text"
             value={content.gateway2_title || ''}
             onChange={(e) => onContentChange('gateway2_title', e.target.value)}
-            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
             placeholder="Card Title"
           />
           <textarea
             value={content.gateway2_description || ''}
             onChange={(e) => onContentChange('gateway2_description', e.target.value)}
-            className="w-full h-24 px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="w-full h-24 px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
             placeholder="Card Description"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
               value={content.gateway2_button_text || ''}
               onChange={(e) => onContentChange('gateway2_button_text', e.target.value)}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
               placeholder="Button Text"
             />
             <input
               type="text"
               value={content.gateway2_button_url || ''}
               onChange={(e) => onContentChange('gateway2_button_url', e.target.value)}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
               placeholder="Button URL"
             />
           </div>
@@ -506,7 +508,11 @@ const AdminSettings: React.FC<{
   onSocialLinksChange: (newLinks: SocialLinks) => void;
   openingHours: OpeningHour[];
   onOpeningHoursChange: (newHours: OpeningHour[]) => void;
-}> = ({ logoUrl, onLogoChange, backgroundUrl, onBackgroundChange, socialLinks, onSocialLinksChange, openingHours, onOpeningHoursChange }) => {
+  abn: string;
+  onAbnChange: (newAbn: string) => void;
+  phoneNumber: string;
+  onPhoneNumberChange: (newPhoneNumber: string) => void;
+}> = ({ logoUrl, onLogoChange, backgroundUrl, onBackgroundChange, socialLinks, onSocialLinksChange, openingHours, onOpeningHoursChange, abn, onAbnChange, phoneNumber, onPhoneNumberChange }) => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bgInputRef = useRef<HTMLInputElement>(null);
 
@@ -529,7 +535,7 @@ const AdminSettings: React.FC<{
   };
 
   return (
-    <div className="bg-slate-800 p-6 rounded-lg shadow-2xl max-w-4xl mx-auto">
+    <div className="bg-slate-800 p-4 sm:p-6 rounded-lg shadow-2xl max-w-4xl mx-auto">
       <h2 className="text-2xl font-semibold mb-6 border-b border-slate-700 pb-4 font-serif">Site Appearance</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -547,7 +553,7 @@ const AdminSettings: React.FC<{
             </button>
           </div>
           <input type="file" ref={logoInputRef} onChange={(e) => handleFileChange(e, onLogoChange)} className="hidden" accept="image/*" />
-          <p className="text-center text-slate-400 text-sm">Hover over the image to change the logo.</p>
+          <p className="text-center text-slate-400 text-sm">Tap the image to change the logo.</p>
         </div>
 
         {/* Background Uploader */}
@@ -568,7 +574,7 @@ const AdminSettings: React.FC<{
             </button>
           </div>
           <input type="file" ref={bgInputRef} onChange={(e) => handleFileChange(e, onBackgroundChange)} className="hidden" accept="image/*" />
-          <p className="text-center text-slate-400 text-sm">Hover over the image to change the background.</p>
+          <p className="text-center text-slate-400 text-sm">Tap the image to change the background.</p>
         </div>
       </div>
 
@@ -577,27 +583,78 @@ const AdminSettings: React.FC<{
         <h3 className="text-xl font-semibold text-slate-200 mb-4">Social Media Links</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="facebook-url" className="block text-sm font-medium text-slate-400 mb-1">Facebook URL</label>
+            <label htmlFor="facebook-url" className="block text-base font-medium text-slate-300 mb-2">Facebook URL</label>
             <input
               id="facebook-url"
               type="text"
               value={socialLinks?.facebook || ''}
               onChange={(e) => onSocialLinksChange({ ...socialLinks, facebook: e.target.value })}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
               placeholder="https://facebook.com/..."
             />
           </div>
           <div>
-            <label htmlFor="instagram-url" className="block text-sm font-medium text-slate-400 mb-1">Instagram URL</label>
+            <label htmlFor="instagram-url" className="block text-base font-medium text-slate-300 mb-2">Instagram URL</label>
             <input
               id="instagram-url"
               type="text"
               value={socialLinks?.instagram || ''}
               onChange={(e) => onSocialLinksChange({ ...socialLinks, instagram: e.target.value })}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
               placeholder="https://instagram.com/..."
             />
           </div>
+        </div>
+      </div>
+
+      {/* Contact Info */}
+      <div className="border-t border-slate-700 pt-6 mt-8">
+        <h3 className="text-xl font-semibold text-slate-200 mb-4">Contact Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="abn" className="block text-base font-medium text-slate-300 mb-2">ABN</label>
+            <input
+              id="abn"
+              type="text"
+              value={abn || ''}
+              onChange={(e) => onAbnChange(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
+              placeholder="XX XXX XXX XXX"
+            />
+          </div>
+          <div>
+            <label htmlFor="phone-number" className="block text-base font-medium text-slate-300 mb-2">Phone Number</label>
+            <input
+              id="phone-number"
+              type="text"
+              value={phoneNumber || ''}
+              onChange={(e) => onPhoneNumberChange(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
+              placeholder="(03) 6272 6600"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Opening Hours */}
+      <div className="border-t border-slate-700 pt-6 mt-8">
+        <h3 className="text-xl font-semibold text-slate-200 mb-4">Opening Hours</h3>
+        <div className="space-y-4">
+          {openingHours.map((hour, index) => (
+            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <span className="w-full sm:w-32 text-slate-300 font-medium text-base">{hour.day}</span>
+              <input
+                type="text"
+                value={hour.time}
+                onChange={(e) => {
+                  const newHours = [...openingHours];
+                  newHours[index] = { ...newHours[index], time: e.target.value };
+                  onOpeningHoursChange(newHours);
+                }}
+                className="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg text-white"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -625,6 +682,10 @@ const AdminPage: React.FC<{
   onSocialLinksChange: (newLinks: SocialLinks) => void;
   openingHours: OpeningHour[];
   onOpeningHoursChange: (newHours: OpeningHour[]) => void;
+  abn: string;
+  onAbnChange: (newAbn: string) => void;
+  phoneNumber: string;
+  onPhoneNumberChange: (newPhoneNumber: string) => void;
 }> = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -638,7 +699,8 @@ const AdminPage: React.FC<{
   const [isNewProductFresh, setIsNewProductFresh] = useState(false);
   const [isNewProductVisible, setIsNewProductVisible] = useState(true);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const [adminView, setAdminView] = useState<'dashboard' | 'products' | 'settings' | 'homepage'>('dashboard');
+  const [adminView, setAdminView] = useState<'dashboard' | 'products' | 'settings' | 'homepage' | 'messages'>('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const categories = ['Fresh Fish', 'Shellfish', 'White Fish', 'Sashimi', 'Other'];
 
@@ -750,14 +812,32 @@ const AdminPage: React.FC<{
   const freshCount = props.products.filter(p => p.is_fresh).length;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex font-sans">
-      <AdminSidebar activeView={adminView} onNavigate={setAdminView} />
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+    <div className="min-h-screen bg-slate-900 text-white flex font-sans relative">
+      <AdminSidebar
+        activeView={adminView}
+        onNavigate={(view) => {
+          setAdminView(view);
+          setIsSidebarOpen(false);
+        }}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold font-serif capitalize">
-              {adminView}
-            </h1>
+            <div className="flex items-center">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="mr-4 md:hidden text-slate-300 hover:text-white"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <h1 className="text-3xl md:text-4xl font-bold font-serif capitalize">
+                {adminView}
+              </h1>
+            </div>
             <div>
               <button onClick={props.onNavigateHome} className="text-slate-400 hover:text-white mr-4">&larr; View Site</button>
               <button onClick={props.onLogout} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">
@@ -770,24 +850,24 @@ const AdminPage: React.FC<{
 
           {adminView === 'products' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-1 bg-slate-800 p-6 rounded-lg shadow-2xl self-start">
+              <div className="lg:col-span-1 bg-slate-800 p-4 sm:p-6 rounded-lg shadow-2xl self-start">
                 <h2 className="text-2xl font-semibold mb-4 font-serif">Add New Product</h2>
-                <form onSubmit={handleAddProduct} className="space-y-4">
+                <form onSubmit={handleAddProduct} className="space-y-5">
                   <div>
-                    <label htmlFor="new-product-name" className="block text-sm font-medium text-slate-400 mb-1">Product Name</label>
-                    <input id="new-product-name" type="text" value={newProductName} onChange={e => setNewProductName(e.target.value)} className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                    <label htmlFor="new-product-name" className="block text-base font-medium text-slate-300 mb-2">Product Name</label>
+                    <input id="new-product-name" type="text" value={newProductName} onChange={e => setNewProductName(e.target.value)} className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg" required />
                   </div>
                   <div>
-                    <label htmlFor="new-product-price" className="block text-sm font-medium text-slate-400 mb-1">Product Price</label>
-                    <input id="new-product-price" type="text" value={newProductPrice} onChange={e => setNewProductPrice(e.target.value)} className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+                    <label htmlFor="new-product-price" className="block text-base font-medium text-slate-300 mb-2">Product Price</label>
+                    <input id="new-product-price" type="text" value={newProductPrice} onChange={e => setNewProductPrice(e.target.value)} className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg" required />
                   </div>
                   <div>
-                    <label htmlFor="new-product-category" className="block text-sm font-medium text-slate-400 mb-1">Category</label>
+                    <label htmlFor="new-product-category" className="block text-base font-medium text-slate-300 mb-2">Category</label>
                     <select
                       id="new-product-category"
                       value={newProductCategory}
                       onChange={e => setNewProductCategory(e.target.value)}
-                      className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-white"
+                      className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-white text-lg"
                     >
                       {categories.map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -795,23 +875,23 @@ const AdminPage: React.FC<{
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="new-product-image" className="block text-sm font-medium text-slate-400 mb-1">Product Image</label>
-                    <input id="new-product-image" type="file" ref={imageInputRef} onChange={handleImageChange} className="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600 transition-colors" accept="image/*" required />
+                    <label htmlFor="new-product-image" className="block text-base font-medium text-slate-300 mb-2">Product Image</label>
+                    <input id="new-product-image" type="file" ref={imageInputRef} onChange={handleImageChange} className="w-full text-base text-slate-400 file:mr-4 file:py-3 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600 transition-colors" accept="image/*" required />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="is-fresh" checked={isNewProductFresh} onChange={e => setIsNewProductFresh(e.target.checked)} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
-                    <label htmlFor="is-fresh" className="text-sm font-medium text-slate-400">Mark as "Fresh Today"</label>
+                  <div className="flex items-center space-x-3">
+                    <input type="checkbox" id="is-fresh" checked={isNewProductFresh} onChange={e => setIsNewProductFresh(e.target.checked)} className="h-5 w-5 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
+                    <label htmlFor="is-fresh" className="text-base font-medium text-slate-300">Mark as "Fresh Today"</label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="is-visible" checked={isNewProductVisible} onChange={e => setIsNewProductVisible(e.target.checked)} className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
-                    <label htmlFor="is-visible" className="text-sm font-medium text-slate-400">Show on public site</label>
+                  <div className="flex items-center space-x-3">
+                    <input type="checkbox" id="is-visible" checked={isNewProductVisible} onChange={e => setIsNewProductVisible(e.target.checked)} className="h-5 w-5 rounded border-slate-600 bg-slate-700 text-sky-500 focus:ring-sky-500" />
+                    <label htmlFor="is-visible" className="text-base font-medium text-slate-300">Show on public site</label>
                   </div>
                   {newProductImageUrl && <img src={newProductImageUrl} alt="Preview" className="mt-2 rounded-md max-h-32 object-contain mx-auto" />}
-                  <button type="submit" className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-4 rounded-md transition-colors duration-300">Add Product</button>
+                  <button type="submit" className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-md transition-colors duration-300 text-lg">Add Product</button>
                 </form>
               </div>
 
-              <div className="lg:col-span-2 bg-slate-800 p-6 rounded-lg shadow-2xl">
+              <div className="lg:col-span-2 bg-slate-800 p-4 sm:p-6 rounded-lg shadow-2xl">
                 <h2 className="text-2xl font-semibold mb-4 font-serif">Manage Products</h2>
                 <div className="overflow-y-auto pr-2">
                   <ProductList products={props.products} isAdmin={true} onDelete={(name) => {
@@ -840,7 +920,15 @@ const AdminPage: React.FC<{
               onSocialLinksChange={props.onSocialLinksChange}
               openingHours={props.openingHours}
               onOpeningHoursChange={props.onOpeningHoursChange}
+              abn={props.abn}
+              onAbnChange={props.onAbnChange}
+              phoneNumber={props.phoneNumber}
+              onPhoneNumberChange={props.onPhoneNumberChange}
             />
+          )}
+
+          {adminView === 'messages' && (
+            <AdminMessages />
           )}
 
         </div>
@@ -865,6 +953,8 @@ const App: React.FC = () => {
   const [products, setProducts] = useState<FishProduct[]>([]);
   const [hours, setHours] = useState<OpeningHour[]>(OPENING_HOURS);
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({ facebook: '', instagram: '' });
+  const [abn, setAbn] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [page, setPage] = useState<'home' | 'admin'>('home');
   const [user, setUser] = useState<User | null>(null);
   const [editingProduct, setEditingProduct] = useState<FishProduct | null>(null);
@@ -872,6 +962,7 @@ const App: React.FC = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+
 
   // Handle URL-based routing
   useEffect(() => {
@@ -903,6 +994,8 @@ const App: React.FC = () => {
         setBackgroundUrl(settingsData.background_url);
         if (settingsData.opening_hours) setHours(settingsData.opening_hours);
         if (settingsData.social_links) setSocialLinks(settingsData.social_links);
+        if (settingsData.abn) setAbn(settingsData.abn);
+        if (settingsData.phone_number) setPhoneNumber(settingsData.phone_number);
       }
 
       // Fetch homepage content
@@ -995,6 +1088,16 @@ const App: React.FC = () => {
     await supabase.from('site_settings').update({ opening_hours: newHours }).eq('id', 1);
   };
 
+  const handleAbnChange = async (newAbn: string) => {
+    setAbn(newAbn);
+    await supabase.from('site_settings').update({ abn: newAbn }).eq('id', 1);
+  };
+
+  const handlePhoneNumberChange = async (newPhoneNumber: string) => {
+    setPhoneNumber(newPhoneNumber);
+    await supabase.from('site_settings').update({ phone_number: newPhoneNumber }).eq('id', 1);
+  };
+
   const handleEditClick = useCallback((product: FishProduct) => {
     setEditingProduct(product);
   }, []);
@@ -1037,22 +1140,13 @@ const App: React.FC = () => {
       filtered = filtered.filter(p => p.name.toLowerCase().includes(lowerTerm));
     }
 
-    // Filter by category
-    if (activeFilter !== 'All') {
-      if (activeFilter === 'Fresh Today') {
-        filtered = filtered.filter(p => p.is_fresh);
-      } else {
-        filtered = filtered.filter(p => p.category === activeFilter);
-      }
-    }
-
     // Filter by visibility (only for public view)
     if (page === 'home') {
       filtered = filtered.filter(p => p.is_visible !== false);
     }
 
     return filtered;
-  }, [products, searchTerm, activeFilter, page]);
+  }, [products, searchTerm, page]);
 
   if (loading) {
     return <LoadingSpinner />;
@@ -1074,6 +1168,8 @@ const App: React.FC = () => {
           activeFilter={activeFilter}
           setActiveFilter={setActiveFilter}
           socialLinks={socialLinks}
+          abn={abn}
+          phoneNumber={phoneNumber}
         />
       )}
       {page === 'admin' && (
@@ -1096,6 +1192,10 @@ const App: React.FC = () => {
           onSocialLinksChange={handleSocialLinksChange}
           openingHours={hours}
           onOpeningHoursChange={handleOpeningHoursChange}
+          abn={abn}
+          onAbnChange={handleAbnChange}
+          phoneNumber={phoneNumber}
+          onPhoneNumberChange={handlePhoneNumberChange}
         />
       )}
       {editingProduct && (

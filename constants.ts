@@ -11,7 +11,11 @@ export const INITIAL_HOMEPAGE_CONTENT: HomepageContent = {
 };
 
 export const OPENING_HOURS: OpeningHour[] = [
+  { day: 'Monday', time: 'Closed' },
+  { day: 'Tuesday', time: 'Closed' },
   { day: 'Wednesday', time: '7am - 1pm' },
   { day: 'Thursday', time: '7am - 2pm' },
   { day: 'Friday', time: '7am - 2:30pm' },
+  { day: 'Saturday', time: 'Closed' },
+  { day: 'Sunday', time: 'Closed' },
 ];

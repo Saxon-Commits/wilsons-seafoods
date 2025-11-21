@@ -1,16 +1,35 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabase';
 
 const ContactForm: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here you would typically handle the form submission, e.g., send to an API
-        console.log({ name, email, message });
-        setSubmitted(true);
+        setLoading(true);
+        setError('');
+
+        try {
+            const { error: supabaseError } = await supabase
+                .from('contact_submissions')
+                .insert([
+                    { name, email, message }
+                ]);
+
+            if (supabaseError) throw supabaseError;
+
+            setSubmitted(true);
+        } catch (err: any) {
+            console.error('Error submitting form:', err);
+            setError('Something went wrong. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -65,8 +84,17 @@ const ContactForm: React.FC = () => {
                         className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue"
                     />
                 </div>
-                <button type="submit" className="w-full md:w-auto bg-brand-blue text-white font-bold text-lg px-8 py-3 rounded-full shadow-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-300">
-                    Send Message
+                {error && (
+                    <div className="bg-red-500/20 text-red-400 p-3 rounded-md mb-4">
+                        {error}
+                    </div>
+                )}
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full md:w-auto bg-brand-blue text-white font-bold text-lg px-8 py-3 rounded-full shadow-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                    {loading ? 'Sending...' : 'Send Message'}
                 </button>
             </form>
         </section>
