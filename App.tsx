@@ -337,7 +337,7 @@ const AdminHomepageContent: React.FC<{
 }> = ({ content, onContentChange }) => {
   const bgInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof HomepageContent) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: keyof HomepageContent) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -345,14 +345,19 @@ const AdminHomepageContent: React.FC<{
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `public/${fileName}`;
 
-    supabase.storage.from('images').upload(filePath, file).then(({ error }) => {
+    try {
+      const { error } = await supabase.storage.from('images').upload(filePath, file);
       if (error) {
         console.error('Error uploading image:', error);
+        alert('Failed to upload image: ' + error.message);
         return;
       }
       const { data } = supabase.storage.from('images').getPublicUrl(filePath);
       onContentChange(field, data.publicUrl);
-    });
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      alert('Failed to upload image');
+    }
   };
 
   return (
@@ -515,23 +520,34 @@ const AdminSettings: React.FC<{
 }> = ({ logoUrl, onLogoChange, backgroundUrl, onBackgroundChange, socialLinks, onSocialLinksChange, openingHours, onOpeningHoursChange, abn, onAbnChange, phoneNumber, onPhoneNumberChange }) => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bgInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBg, setUploadingBg] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void, setLoading: (loading: boolean) => void) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setLoading(true);
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `public/${fileName}`;
 
-    supabase.storage.from('images').upload(filePath, file).then(({ error }) => {
+    try {
+      const { error } = await supabase.storage.from('images').upload(filePath, file);
       if (error) {
         console.error('Error uploading image:', error);
+        alert('Failed to upload image: ' + error.message);
+        setLoading(false);
         return;
       }
       const { data } = supabase.storage.from('images').getPublicUrl(filePath);
       callback(data.publicUrl);
-    });
+      setLoading(false);
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      alert('Failed to upload image');
+      setLoading(false);
+    }
   };
 
   return (
@@ -543,23 +559,34 @@ const AdminSettings: React.FC<{
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-slate-200">Site Logo</h3>
           <div className="relative group w-48 h-48 mx-auto">
+            {uploadingLogo && (
+              <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-full z-10">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+              </div>
+            )}
             <img src={logoUrl} alt="Current Logo" className="w-full h-full rounded-full object-contain shadow-md bg-slate-700" />
             <button
               onClick={() => logoInputRef.current?.click()}
               className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
               aria-label="Change logo"
+              disabled={uploadingLogo}
             >
               <CameraIcon className="w-8 h-8 text-white" />
             </button>
           </div>
-          <input type="file" ref={logoInputRef} onChange={(e) => handleFileChange(e, onLogoChange)} className="hidden" accept="image/*" />
-          <p className="text-center text-slate-400 text-sm">Tap the image to change the logo.</p>
+          <input type="file" ref={logoInputRef} onChange={(e) => handleFileChange(e, onLogoChange, setUploadingLogo)} className="hidden" accept="image/*" disabled={uploadingLogo} />
+          <p className="text-center text-slate-400 text-sm">{uploadingLogo ? 'Uploading...' : 'Tap the image to change the logo.'}</p>
         </div>
 
         {/* Background Uploader */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-slate-200">Homepage Background</h3>
           <div className="relative group w-full h-48">
+            {uploadingBg && (
+              <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-md z-10">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+              </div>
+            )}
             {backgroundUrl ? (
               <img src={backgroundUrl} alt="Current Background" className="w-full h-full rounded-md object-cover shadow-md bg-slate-700" />
             ) : (
@@ -569,12 +596,13 @@ const AdminSettings: React.FC<{
               onClick={() => bgInputRef.current?.click()}
               className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"
               aria-label="Change background image"
+              disabled={uploadingBg}
             >
               <CameraIcon className="w-8 h-8 text-white" />
             </button>
           </div>
-          <input type="file" ref={bgInputRef} onChange={(e) => handleFileChange(e, onBackgroundChange)} className="hidden" accept="image/*" />
-          <p className="text-center text-slate-400 text-sm">Tap the image to change the background.</p>
+          <input type="file" ref={bgInputRef} onChange={(e) => handleFileChange(e, onBackgroundChange, setUploadingBg)} className="hidden" accept="image/*" disabled={uploadingBg} />
+          <p className="text-center text-slate-400 text-sm">{uploadingBg ? 'Uploading...' : 'Tap the image to change the background.'}</p>
         </div>
       </div>
 
