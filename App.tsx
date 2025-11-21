@@ -8,7 +8,7 @@ import Hours from './components/Hours';
 import Footer from './components/Footer';
 import EditProductModal from './components/EditProductModal';
 import { OPENING_HOURS, INITIAL_LOGO_URL, INITIAL_HOMEPAGE_CONTENT } from './constants';
-import { FishProduct, OpeningHour, HomepageContent } from './types';
+import { FishProduct, OpeningHour, HomepageContent, SiteSettings, SocialLinks } from './types';
 import { BoxIcon } from './components/icons/BoxIcon';
 import { SettingsIcon } from './components/icons/SettingsIcon';
 import { CameraIcon } from './components/icons/CameraIcon';
@@ -55,25 +55,26 @@ const GatewayCard: React.FC<{
 };
 
 const GatewaySection: React.FC<{
+  content: HomepageContent;
   onSmoothScroll: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-}> = ({ onSmoothScroll }) => {
+}> = ({ content, onSmoothScroll }) => {
   return (
     <section>
       <div className="grid md:grid-cols-2 gap-8 md:gap-12">
         <GatewayCard
-          imageUrl="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200&auto=format&fit=crop"
-          headline="Shop Our Public Store"
-          description="Get the freshest Tasmanian seafood and pickup in store today. Browse our public store and pay online."
-          buttonText="Shop Now"
-          buttonHref="#products"
+          imageUrl={content.gateway1_image_url || "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1200&auto=format&fit=crop"}
+          headline={content.gateway1_title || "Shop Our Public Store"}
+          description={content.gateway1_description || "Get the freshest Tasmanian seafood and pickup in store today. Browse our public store and pay online."}
+          buttonText={content.gateway1_button_text || "Shop Now"}
+          buttonHref={content.gateway1_button_url || "#products"}
           onClick={onSmoothScroll}
         />
         <GatewayCard
-          imageUrl="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=1200&auto=format&fit=crop"
-          headline="Wholesale & Chef's Portal"
-          description="For our restaurant, chef, and wholesale partners. Log in to your Fresho account or apply for a new trade account here."
-          buttonText="Enter Portal"
-          buttonHref="https://www.fresho.com/"
+          imageUrl={content.gateway2_image_url || "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=1200&auto=format&fit=crop"}
+          headline={content.gateway2_title || "Wholesale & Chef's Portal"}
+          description={content.gateway2_description || "For our restaurant, chef, and wholesale partners. Log in to your Fresho account or apply for a new trade account here."}
+          buttonText={content.gateway2_button_text || "Enter Portal"}
+          buttonHref={content.gateway2_button_url || "https://www.fresho.com/"}
         />
       </div>
     </section>
@@ -94,77 +95,132 @@ const HomePage: React.FC<{
   setSearchTerm: (term: string) => void;
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
-}> = ({ logoUrl, backgroundUrl, hours, content, isBannerVisible, onDismissBanner, filteredProducts, searchTerm, setSearchTerm, activeFilter, setActiveFilter }) => {
-  const pageStyle = backgroundUrl ? {
-    backgroundImage: `url(${backgroundUrl})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-  } : {};
-
+  socialLinks: SocialLinks;
+}> = ({ logoUrl, backgroundUrl, hours, content, isBannerVisible, onDismissBanner, filteredProducts, searchTerm, setSearchTerm, activeFilter, setActiveFilter, socialLinks }) => {
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const targetId = e.currentTarget.getAttribute('href');
-    if (!targetId) return;
-    const targetElement = document.querySelector(targetId);
-    if (targetElement) {
-      const headerOffset = 120; // Account for sticky header
-      const elementPosition = targetElement.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
+    const href = e.currentTarget.getAttribute('href');
+    if (href?.startsWith('#')) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans" style={pageStyle}>
-      {isBannerVisible && <AnnouncementBanner text={content.announcement_text} onDismiss={onDismissBanner} />}
-      <Header logo={logoUrl} />
-      <main>
-        {/* Hero Section */}
-        <section className="min-h-[calc(100vh-10rem)] md:min-h-screen flex items-center justify-center text-center px-4 relative">
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
-          <div className="space-y-6 z-10">
-            <h2 className="text-5xl md:text-7xl font-serif font-extrabold text-white tracking-tight [text-shadow:0_3px_6px_rgba(0,0,0,0.5)]">
-              {content.hero_title}
-            </h2>
-            <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto [text-shadow:0_2px_4px_rgba(0,0,0,0.5)]">
-              {content.hero_subtitle}
-            </p>
-            <a href="#products" onClick={handleSmoothScroll} className="inline-block bg-brand-blue text-white font-bold text-lg px-8 py-3 rounded-full shadow-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-300">
-              Buy Now
-            </a>
+    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-sky-500/30">
+      {isBannerVisible && (
+        <AnnouncementBanner
+          text={content.announcement_text}
+          onDismiss={onDismissBanner}
+        />
+      )}
+
+      <Header logoUrl={logoUrl} />
+
+      {/* Hero Section */}
+      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-black/40 z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-slate-900 z-10"></div>
+          {backgroundUrl && (
+            <div
+              className="w-full h-full bg-cover bg-center transform scale-105 animate-slow-zoom"
+              style={{ backgroundImage: `url(${backgroundUrl})` }}
+            ></div>
+          )}
+        </div>
+
+        <div className="relative z-20 text-center px-4 max-w-5xl mx-auto">
+          <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 tracking-tight drop-shadow-lg">
+            {content.hero_title}
+          </h1>
+          <p className="text-xl md:text-2xl text-slate-200 mb-10 font-light tracking-wide max-w-3xl mx-auto drop-shadow-md">
+            {content.hero_subtitle}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={(e) => handleSmoothScroll(e as any)}
+              className="bg-brand-blue hover:bg-opacity-90 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-brand-blue/30 text-lg"
+            >
+              <a href="#products">Shop Fresh Seafood</a>
+            </button>
+            <button className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-4 px-10 rounded-full transition-all duration-300 border border-white/30 hover:border-white/50 text-lg">
+              <a href="#about" onClick={(e) => handleSmoothScroll(e as any)}>Our Story</a>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+        {/* Gateway Cards Section */}
+        <GatewaySection content={content} onSmoothScroll={handleSmoothScroll} />
+
+        {/* Products Section */}
+        <section id="products" className="scroll-mt-24">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">Fresh From The Boat</h2>
+            <div className="h-1 w-24 bg-brand-blue mx-auto rounded-full"></div>
+          </div>
+
+          <ProductFilters
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+          />
+
+          <ProductList products={filteredProducts} />
+        </section>
+
+        {/* About Us Section */}
+        <section id="about" className="scroll-mt-24">
+          <AboutUs text={content.about_text} image_url={content.about_image_url} />
+        </section>
+
+        {/* Hours & Location */}
+        <section className="grid md:grid-cols-2 gap-12 items-start">
+          <div className="space-y-8">
+            <div className="text-center md:text-left">
+              <h2 className="text-3xl font-serif font-bold text-white mb-6">Visit Our Store</h2>
+              <p className="text-slate-400 text-lg mb-8">
+                Experience the finest selection of seafood in person. Our friendly staff are ready to help you choose the perfect catch for your next meal.
+              </p>
+              <div className="flex items-center justify-center md:justify-start space-x-4 text-slate-300 mb-4">
+                <HomeIcon className="w-6 h-6 text-brand-blue" />
+                <span className="text-lg">5 Sussex St, Glenorchy TAS 7010</span>
+              </div>
+            </div>
+            <Hours hours={hours} />
+          </div>
+          <div className="h-[400px] rounded-xl overflow-hidden shadow-2xl border border-slate-700/50">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2923.720466628646!2d147.2799489766666!3d-42.82864697116116!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xaa6e74f78091157b%3A0x55c65545e143327!2sWilson's%20Seafoods!5e0!3m2!1sen!2sau!4v1709600000000!5m2!1sen!2sau"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Wilson's Seafoods Location"
+              className="grayscale hover:grayscale-0 transition-all duration-500"
+            ></iframe>
           </div>
         </section>
 
-        <div className="bg-slate-900 relative z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-            <div className="space-y-20 md:space-y-28">
-              <GatewaySection onSmoothScroll={handleSmoothScroll} />
-
-              <section id="products" className="text-center">
-                <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">Today's Catch</h2>
-                <p className="text-slate-400 max-w-2xl mx-auto mb-12">Browse our selection of locally sourced, premium seafood.</p>
-                <ProductFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
-                <ProductList products={filteredProducts} />
-              </section>
-
-              <AboutUs text={content.about_text} image_url={content.about_image_url} />
-
-              <section id="hours" className="text-center">
-                <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-12">Opening Hours</h2>
-                <Hours hours={hours} />
-              </section>
-
-              <ContactForm />
-
-            </div>
+        {/* Contact Section */}
+        <section className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-serif font-bold text-white mb-4">Get In Touch</h2>
+            <p className="text-slate-400">Have a question or special order? Send us a message.</p>
           </div>
-        </div>
+          <ContactForm />
+        </section>
       </main>
-      <Footer />
+
+      <Footer socialLinks={socialLinks} />
     </div>
   );
 };
@@ -176,7 +232,7 @@ const ProductFilters: React.FC<{
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
 }> = ({ searchTerm, setSearchTerm, activeFilter, setActiveFilter }) => {
-  const filters = ['All', 'Fresh Today'];
+  const filters = ['All', 'Fresh Fish', 'Shellfish', 'White Fish', 'Sashimi', 'Other'];
 
   const baseButtonClass = "px-6 py-2.5 rounded-full font-semibold text-md transition-all duration-300";
   const activeButtonClass = "bg-ice-blue text-slate-900 shadow";
@@ -347,6 +403,94 @@ const AdminHomepageContent: React.FC<{
         <input type="file" ref={bgInputRef} onChange={(e) => handleFileChange(e, 'about_image_url')} className="hidden" accept="image/*" />
         <p className="text-center text-slate-400 text-sm">Hover over the image to change it.</p>
       </div>
+
+      {/* Gateway Card 1 */}
+      <div className="border-t border-slate-700 pt-6">
+        <h3 className="text-xl font-semibold text-slate-200 mb-4">Gateway Card 1 (Public Store)</h3>
+        <div className="space-y-4">
+          <input
+            type="text"
+            value={content.gateway1_title || ''}
+            onChange={(e) => onContentChange('gateway1_title', e.target.value)}
+            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            placeholder="Card Title"
+          />
+          <textarea
+            value={content.gateway1_description || ''}
+            onChange={(e) => onContentChange('gateway1_description', e.target.value)}
+            className="w-full h-24 px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            placeholder="Card Description"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              value={content.gateway1_button_text || ''}
+              onChange={(e) => onContentChange('gateway1_button_text', e.target.value)}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="Button Text"
+            />
+            <input
+              type="text"
+              value={content.gateway1_button_url || ''}
+              onChange={(e) => onContentChange('gateway1_button_url', e.target.value)}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="Button URL"
+            />
+          </div>
+          {/* Image Upload for Gateway 1 - simplified for brevity, ideally reuse upload logic */}
+          <div className="relative group w-full h-32">
+            <img src={content.gateway1_image_url} alt="Gateway 1" className="w-full h-full rounded-md object-cover shadow-md bg-slate-700" />
+            <label className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md cursor-pointer">
+              <CameraIcon className="w-8 h-8 text-white" />
+              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'gateway1_image_url')} />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Gateway Card 2 */}
+      <div className="border-t border-slate-700 pt-6">
+        <h3 className="text-xl font-semibold text-slate-200 mb-4">Gateway Card 2 (Wholesale)</h3>
+        <div className="space-y-4">
+          <input
+            type="text"
+            value={content.gateway2_title || ''}
+            onChange={(e) => onContentChange('gateway2_title', e.target.value)}
+            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            placeholder="Card Title"
+          />
+          <textarea
+            value={content.gateway2_description || ''}
+            onChange={(e) => onContentChange('gateway2_description', e.target.value)}
+            className="w-full h-24 px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            placeholder="Card Description"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              value={content.gateway2_button_text || ''}
+              onChange={(e) => onContentChange('gateway2_button_text', e.target.value)}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="Button Text"
+            />
+            <input
+              type="text"
+              value={content.gateway2_button_url || ''}
+              onChange={(e) => onContentChange('gateway2_button_url', e.target.value)}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="Button URL"
+            />
+          </div>
+          {/* Image Upload for Gateway 2 */}
+          <div className="relative group w-full h-32">
+            <img src={content.gateway2_image_url} alt="Gateway 2" className="w-full h-full rounded-md object-cover shadow-md bg-slate-700" />
+            <label className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md cursor-pointer">
+              <CameraIcon className="w-8 h-8 text-white" />
+              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'gateway2_image_url')} />
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -358,7 +502,11 @@ const AdminSettings: React.FC<{
   onLogoChange: (newLogo: string) => void;
   backgroundUrl: string | null;
   onBackgroundChange: (newBg: string) => void;
-}> = ({ logoUrl, onLogoChange, backgroundUrl, onBackgroundChange }) => {
+  socialLinks: SocialLinks;
+  onSocialLinksChange: (newLinks: SocialLinks) => void;
+  openingHours: OpeningHour[];
+  onOpeningHoursChange: (newHours: OpeningHour[]) => void;
+}> = ({ logoUrl, onLogoChange, backgroundUrl, onBackgroundChange, socialLinks, onSocialLinksChange, openingHours, onOpeningHoursChange }) => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bgInputRef = useRef<HTMLInputElement>(null);
 
@@ -423,6 +571,35 @@ const AdminSettings: React.FC<{
           <p className="text-center text-slate-400 text-sm">Hover over the image to change the background.</p>
         </div>
       </div>
+
+      {/* Social Links */}
+      <div className="border-t border-slate-700 pt-6 mt-8">
+        <h3 className="text-xl font-semibold text-slate-200 mb-4">Social Media Links</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="facebook-url" className="block text-sm font-medium text-slate-400 mb-1">Facebook URL</label>
+            <input
+              id="facebook-url"
+              type="text"
+              value={socialLinks?.facebook || ''}
+              onChange={(e) => onSocialLinksChange({ ...socialLinks, facebook: e.target.value })}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="https://facebook.com/..."
+            />
+          </div>
+          <div>
+            <label htmlFor="instagram-url" className="block text-sm font-medium text-slate-400 mb-1">Instagram URL</label>
+            <input
+              id="instagram-url"
+              type="text"
+              value={socialLinks?.instagram || ''}
+              onChange={(e) => onSocialLinksChange({ ...socialLinks, instagram: e.target.value })}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="https://instagram.com/..."
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -444,6 +621,10 @@ const AdminPage: React.FC<{
   onBackgroundChange: (newBg: string) => void;
   homepageContent: HomepageContent;
   onHomepageContentChange: (field: keyof HomepageContent, value: string) => void;
+  socialLinks: SocialLinks;
+  onSocialLinksChange: (newLinks: SocialLinks) => void;
+  openingHours: OpeningHour[];
+  onOpeningHoursChange: (newHours: OpeningHour[]) => void;
 }> = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -453,10 +634,13 @@ const AdminPage: React.FC<{
   const [newProductPrice, setNewProductPrice] = useState('');
   const [newProductImageFile, setNewProductImageFile] = useState<File | null>(null);
   const [newProductImageUrl, setNewProductImageUrl] = useState<string>('');
+  const [newProductCategory, setNewProductCategory] = useState('Fresh Fish');
   const [isNewProductFresh, setIsNewProductFresh] = useState(false);
   const [isNewProductVisible, setIsNewProductVisible] = useState(true);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [adminView, setAdminView] = useState<'dashboard' | 'products' | 'settings' | 'homepage'>('dashboard');
+
+  const categories = ['Fresh Fish', 'Shellfish', 'White Fish', 'Sashimi', 'Other'];
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -501,7 +685,14 @@ const AdminPage: React.FC<{
 
     const { data: urlData } = supabase.storage.from('images').getPublicUrl(filePath);
 
-    await props.onAddProduct({ name: newProductName, price: newProductPrice, image_url: urlData.publicUrl, is_fresh: isNewProductFresh, is_visible: isNewProductVisible });
+    await props.onAddProduct({
+      name: newProductName,
+      price: newProductPrice,
+      image_url: urlData.publicUrl,
+      is_fresh: isNewProductFresh,
+      is_visible: isNewProductVisible,
+      category: newProductCategory
+    });
 
     setNewProductName('');
     setNewProductPrice('');
@@ -509,8 +700,9 @@ const AdminPage: React.FC<{
     setNewProductImageUrl('');
     setIsNewProductFresh(false);
     setIsNewProductVisible(true);
+    setNewProductCategory('Fresh Fish');
     if (imageInputRef.current) {
-      imageInputRef.current.value = "";
+      imageInputRef.current.value = '';
     }
   };
 
@@ -590,6 +782,19 @@ const AdminPage: React.FC<{
                     <input id="new-product-price" type="text" value={newProductPrice} onChange={e => setNewProductPrice(e.target.value)} className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" required />
                   </div>
                   <div>
+                    <label htmlFor="new-product-category" className="block text-sm font-medium text-slate-400 mb-1">Category</label>
+                    <select
+                      id="new-product-category"
+                      value={newProductCategory}
+                      onChange={e => setNewProductCategory(e.target.value)}
+                      className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-white"
+                    >
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
                     <label htmlFor="new-product-image" className="block text-sm font-medium text-slate-400 mb-1">Product Image</label>
                     <input id="new-product-image" type="file" ref={imageInputRef} onChange={handleImageChange} className="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600 transition-colors" accept="image/*" required />
                   </div>
@@ -631,6 +836,10 @@ const AdminPage: React.FC<{
               onLogoChange={props.onLogoChange}
               backgroundUrl={props.backgroundUrl}
               onBackgroundChange={props.onBackgroundChange}
+              socialLinks={props.socialLinks}
+              onSocialLinksChange={props.onSocialLinksChange}
+              openingHours={props.openingHours}
+              onOpeningHoursChange={props.onOpeningHoursChange}
             />
           )}
 
@@ -654,7 +863,8 @@ const App: React.FC = () => {
   const [logoUrl, setLogoUrl] = useState<string>(INITIAL_LOGO_URL);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
   const [products, setProducts] = useState<FishProduct[]>([]);
-  const [hours] = useState<OpeningHour[]>(OPENING_HOURS);
+  const [hours, setHours] = useState<OpeningHour[]>(OPENING_HOURS);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>({ facebook: '', instagram: '' });
   const [page, setPage] = useState<'home' | 'admin'>('home');
   const [user, setUser] = useState<User | null>(null);
   const [editingProduct, setEditingProduct] = useState<FishProduct | null>(null);
@@ -691,6 +901,8 @@ const App: React.FC = () => {
       if (settingsData) {
         setLogoUrl(settingsData.logo_url);
         setBackgroundUrl(settingsData.background_url);
+        if (settingsData.opening_hours) setHours(settingsData.opening_hours);
+        if (settingsData.social_links) setSocialLinks(settingsData.social_links);
       }
 
       // Fetch homepage content
@@ -773,6 +985,16 @@ const App: React.FC = () => {
     await supabase.from('homepage_content').update({ [field]: value }).eq('id', 1);
   };
 
+  const handleSocialLinksChange = async (newLinks: SocialLinks) => {
+    setSocialLinks(newLinks);
+    await supabase.from('site_settings').update({ social_links: newLinks }).eq('id', 1);
+  };
+
+  const handleOpeningHoursChange = async (newHours: OpeningHour[]) => {
+    setHours(newHours);
+    await supabase.from('site_settings').update({ opening_hours: newHours }).eq('id', 1);
+  };
+
   const handleEditClick = useCallback((product: FishProduct) => {
     setEditingProduct(product);
   }, []);
@@ -807,19 +1029,30 @@ const App: React.FC = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    return products
-      .filter(p => {
-        // On public site, only show visible products
-        if (page === 'home' && p.is_visible === false) return false;
+    let filtered = products;
 
-        // Filter by "Fresh Today"
-        if (activeFilter === 'Fresh Today') {
-          return p.is_fresh;
-        }
-        return true;
-      })
-      .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [products, activeFilter, searchTerm, page]);
+    // Filter by search term
+    if (searchTerm) {
+      const lowerTerm = searchTerm.toLowerCase();
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(lowerTerm));
+    }
+
+    // Filter by category
+    if (activeFilter !== 'All') {
+      if (activeFilter === 'Fresh Today') {
+        filtered = filtered.filter(p => p.is_fresh);
+      } else {
+        filtered = filtered.filter(p => p.category === activeFilter);
+      }
+    }
+
+    // Filter by visibility (only for public view)
+    if (page === 'home') {
+      filtered = filtered.filter(p => p.is_visible !== false);
+    }
+
+    return filtered;
+  }, [products, searchTerm, activeFilter, page]);
 
   if (loading) {
     return <LoadingSpinner />;
@@ -858,6 +1091,10 @@ const App: React.FC = () => {
           onBackgroundChange={handleBackgroundChange}
           homepageContent={homepageContent}
           onHomepageContentChange={handleContentChange}
+          socialLinks={socialLinks}
+          onSocialLinksChange={handleSocialLinksChange}
+          openingHours={hours}
+          onOpeningHoursChange={handleOpeningHoursChange}
         />
       )}
       {editingProduct && (

@@ -14,7 +14,10 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
   const [image_url, setImageUrl] = useState('');
   const [is_fresh, setIsFresh] = useState(false);
   const [is_visible, setIsVisible] = useState(true);
+  const [category, setCategory] = useState('Fresh Fish');
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const categories = ['Fresh Fish', 'Shellfish', 'White Fish', 'Sashimi', 'Other'];
 
   useEffect(() => {
     if (product) {
@@ -23,6 +26,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
       setImageUrl(product.image_url);
       setIsFresh(product.is_fresh || false);
       setIsVisible(product.is_visible !== false);
+      setCategory(product.category || 'Fresh Fish');
     }
   }, [product]);
 
@@ -46,7 +50,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(product.name, { ...product, name, price, image_url, is_fresh, is_visible });
+    onSave(product.name, { ...product, name, price, image_url, is_fresh, is_visible, category });
   };
 
   if (!product) return null;
@@ -66,6 +70,19 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ product, onSave, on
           <div>
             <label htmlFor="edit-product-price" className="block text-sm font-medium text-slate-400 mb-1">Product Price</label>
             <input id="edit-product-price" type="text" value={price} onChange={e => setPrice(e.target.value)} className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" required />
+          </div>
+          <div>
+            <label htmlFor="edit-product-category" className="block text-sm font-medium text-slate-400 mb-1">Category</label>
+            <select
+              id="edit-product-category"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-white"
+            >
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label htmlFor="edit-product-image" className="block text-sm font-medium text-slate-400 mb-1">Product Image</label>
