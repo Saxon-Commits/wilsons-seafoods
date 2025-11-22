@@ -54,7 +54,7 @@ const ProductCard: React.FC<{
         {onToggleVisibility && product.id && (
           <button
             onClick={() => onToggleVisibility(product.id!)}
-            className={`p-1.5 rounded-full bg-slate-900/60 transition-colors ${product.is_visible !== false ? 'text-slate-400 hover:bg-slate-700 hover:text-white' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}
+            className={`p-1.5 rounded-full bg-slate-800/60 transition-colors ${product.is_visible !== false ? 'text-slate-400 hover:bg-slate-700 hover:text-white' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`}
             aria-label={product.is_visible !== false ? "Hide product" : "Show product"}
           >
             {product.is_visible !== false ? <EyeIcon /> : <EyeOffIcon />}
@@ -63,7 +63,7 @@ const ProductCard: React.FC<{
         {onEdit && (
           <button
             onClick={() => onEdit(product)}
-            className="p-1.5 rounded-full bg-slate-900/60 text-slate-400 hover:bg-sky-600 hover:text-white transition-colors"
+            className="p-1.5 rounded-full bg-slate-800/60 text-slate-400 hover:bg-sky-600 hover:text-white transition-colors"
             aria-label={`Edit ${product.name}`}
           >
             <PencilIcon />
@@ -72,7 +72,7 @@ const ProductCard: React.FC<{
         {onDelete && (
           <button
             onClick={() => onDelete(product.name)}
-            className="p-1.5 rounded-full bg-slate-900/60 text-slate-400 hover:bg-red-600 hover:text-white transition-colors"
+            className="p-1.5 rounded-full bg-slate-800/60 text-slate-400 hover:bg-red-600 hover:text-white transition-colors"
             aria-label={`Delete ${product.name}`}
           >
             <XIcon />

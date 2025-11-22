@@ -113,7 +113,9 @@ const HomePage: React.FC<{
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-sky-500/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 text-slate-100 font-sans selection:bg-sky-500/30 relative">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
       {isBannerVisible && (
         <AnnouncementBanner
           text={content.announcement_text}
@@ -127,7 +129,7 @@ const HomePage: React.FC<{
       <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-black/40 z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-slate-900 z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-slate-800 z-10"></div>
           {backgroundUrl && (
             <div
               className="w-full h-full bg-cover bg-center transform scale-105 animate-slow-zoom"
@@ -826,8 +828,10 @@ const AdminPage: React.FC<{
 
   if (!props.user) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4 font-sans">
-        <div className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 text-white flex items-center justify-center p-4 font-sans relative overflow-hidden">
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
+        <div className="w-full max-w-md relative z-10">
           <button onClick={props.onNavigateHome} className="text-slate-400 hover:text-white mb-8">&larr; Back to Home</button>
           <form onSubmit={handleLogin} className="bg-slate-800 p-8 rounded-lg shadow-2xl">
             <h2 className="text-3xl font-bold mb-6 text-center font-serif">Admin Login</h2>
@@ -868,7 +872,9 @@ const AdminPage: React.FC<{
   const freshCount = props.products.filter(p => p.is_fresh).length;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex font-sans relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 text-white flex font-sans relative overflow-hidden">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
       <AdminSidebar
         activeView={adminView}
         onNavigate={(view) => {
@@ -995,8 +1001,10 @@ const AdminPage: React.FC<{
 
 // --- Loading Component ---
 const LoadingSpinner: React.FC = () => (
-  <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-brand-blue"></div>
+  <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 flex items-center justify-center relative overflow-hidden">
+    <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
+    <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none z-0"></div>
+    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-brand-blue relative z-10"></div>
   </div>
 );
 
