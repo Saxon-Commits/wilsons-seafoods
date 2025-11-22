@@ -32,21 +32,27 @@ const GatewayCard: React.FC<{
 }> = ({ imageUrl, headline, description, buttonText, buttonHref, onClick }) => {
   const isExternal = buttonHref.startsWith('http');
   return (
-    <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700/80 group transform transition-all duration-300 hover:shadow-2xl hover:shadow-brand-blue/20 hover:-translate-y-2 flex flex-col">
+    <div className="glass-panel rounded-xl overflow-hidden group transform transition-all duration-300 hover:shadow-2xl hover:shadow-brand-blue/20 hover:-translate-y-2 flex flex-col h-full border border-white/5">
       <div className="relative overflow-hidden h-64 flex-shrink-0">
-        <img src={imageUrl} alt={headline} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <img src={imageUrl} alt={headline} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" />
+        {/* Dark gradient overlay to make text readable if it moves over image, adds depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
       </div>
-      <div className="p-6 md:p-8 text-center flex flex-col flex-grow">
-        <h3 className="text-2xl md:text-3xl font-serif font-bold text-white mb-3">{headline}</h3>
-        <p className="text-slate-400 mb-6 flex-grow">{description}</p>
+
+      <div className="p-8 flex flex-col flex-grow text-center relative">
+        {/* Decorative Gold Line */}
+        <div className="w-12 h-1 bg-brand-gold mx-auto mb-6 rounded-full opacity-80"></div>
+
+        <h3 className="text-3xl font-serif font-bold text-white mb-4 group-hover:text-brand-blue transition-colors">{headline}</h3>
+        <p className="text-slate-300 mb-8 flex-grow leading-relaxed text-lg font-light">{description}</p>
+
         <div className="mt-auto">
           <a
             href={buttonHref}
             onClick={onClick}
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            className="inline-block bg-brand-blue text-white font-bold text-lg px-8 py-3 rounded-full shadow-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-300"
+            className="inline-block bg-brand-blue hover:bg-brand-blue/80 text-white font-bold text-lg px-10 py-3.5 rounded-fullyb shadow-lg shadow-brand-blue/30 transform hover:scale-105 transition-all duration-300 border-t border-white/20"
           >
             {buttonText}
           </a>
