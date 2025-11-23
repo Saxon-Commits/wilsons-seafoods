@@ -89,6 +89,7 @@ const GatewaySection: React.FC<{
 }> = ({ content, onSmoothScroll }) => {
   return (
     <motion.section
+      aria-label="Service options"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
@@ -211,7 +212,7 @@ const HomePage: React.FC<{
         <GatewaySection content={content} onSmoothScroll={handleSmoothScroll} />
 
         {/* Products Section */}
-        <section id="products" className="scroll-mt-24">
+        <section id="products" className="scroll-mt-24" aria-label="Fresh seafood products">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -257,6 +258,7 @@ const HomePage: React.FC<{
         <motion.section
           id="about"
           className="scroll-mt-24"
+          aria-label="About Wilson's Seafoods"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -268,6 +270,7 @@ const HomePage: React.FC<{
         {/* Hours & Location */}
         <motion.section
           className="grid md:grid-cols-2 gap-12 items-start"
+          aria-label="Store location and hours"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -304,6 +307,7 @@ const HomePage: React.FC<{
         {/* Contact Section */}
         <motion.section
           className="max-w-3xl mx-auto"
+          aria-label="Contact form"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
