@@ -37,6 +37,9 @@ const Footer: React.FC<{ socialLinks?: { facebook: string; instagram: string; },
         </div>
         <div className="mt-12 border-t border-slate-700 pt-8 text-center">
           <p>&copy; {new Date().getFullYear()} Wilsons Seafoods. All Rights Reserved.</p>
+          <p className="mt-2 text-xs text-slate-600">
+            This website was built by <a href="https://www.getsaxon.dev/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-400 transition-colors">getsaxon.dev</a>
+          </p>
         </div>
       </div>
     </footer>
