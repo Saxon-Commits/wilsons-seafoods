@@ -96,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({ logo }) => {
 
           <nav className="hidden md:block">
             <ul className="flex items-center space-x-8">
-              <NavLink href="https://www.fresho.com/">Wholesale</NavLink>
+              <NavLink href="https://app.fresho.com/wilsons-seafoods">Wholesale</NavLink>
               <NavLink href="#about" onClick={handleNavClick}>About Us</NavLink>
               <NavLink href="#contact" onClick={handleNavClick}>Contact</NavLink>
             </ul>
@@ -120,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({ logo }) => {
         </div>
         <nav className="flex flex-col items-center justify-center h-full -mt-16">
           <ul className="flex flex-col items-center space-y-8 font-serif text-2xl">
-            <NavLink href="https://www.fresho.com/">Wholesale</NavLink>
+            <NavLink href="https://app.fresho.com/wilsons-seafoods">Wholesale</NavLink>
             <NavLink href="#about" onClick={handleNavClick}>About Us</NavLink>
             <NavLink href="#contact" onClick={handleNavClick}>Contact</NavLink>
           </ul>
