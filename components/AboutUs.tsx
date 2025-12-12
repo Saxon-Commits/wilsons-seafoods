@@ -17,7 +17,7 @@ const AboutUs: React.FC<AboutUsProps> = ({ text, image_url }) => {
       <div className="order-1 md:order-2">
         <img
           src={image_url}
-          alt="Wilsons Seafoods storefront"
+          alt="About Wilsons Seafoods"
           loading="lazy"
           className="rounded-xl shadow-lg w-full h-auto object-cover aspect-[4/3]"
         />
